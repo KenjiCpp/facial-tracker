@@ -10,7 +10,7 @@ if (cap.isOpened()== False):
     print("Error opening video stream or file")
 
 frame_shape   = (int(cap.get(3)), int(cap.get(4)))
-process_scale = 10
+process_scale = 6
 
 display_shape = (frame_shape[0] // 2, frame_shape[1] // 2)
 process_shape = (frame_shape[0] // process_scale, frame_shape[1] // process_scale)
@@ -49,7 +49,7 @@ while(cap.isOpened()):
 
                 H = np.matmul(upT, np.linalg.inv(ppT + 0.01 * np.identity(ppT.shape[0])))
 
-                ekf.predict_update(feature_points.flatten().reshape(-1, 1), lambda state: H, lambda state: np.matmul(H, state))
+                ekf.update(feature_points.flatten().reshape(-1, 1), lambda state: H, lambda state: np.matmul(H, state))
 
         else:
             new_feature_points = fpe.get_correlated_feature_points(img_old, img, feature_points, patch_size)
@@ -57,7 +57,7 @@ while(cap.isOpened()):
 
                 # Handle next frame
 
-                ekf.predict_update(new_feature_points.flatten().reshape(-1, 1), lambda state: H, lambda state: np.matmul(H, state))
+                ekf.update(new_feature_points.flatten().reshape(-1, 1), lambda state: H, lambda state: np.matmul(H, state))
 
                 feature_points = new_feature_points
 
